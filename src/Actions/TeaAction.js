@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FETCH_TEA_REQUEST, FETCH_TEA_FAILURE, FETCH_TEA_SUCCESS } from "../Constants/Constants";
 
-const API_KEY = 'quyg001xNfy9ty9eJMtCl0DKDGzzO6T7xZXKageu';
+const API_KEY = 'jjj';
 
 export const ChangeTypeOfTea = (value) => {
     return {
