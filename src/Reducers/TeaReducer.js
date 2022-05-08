@@ -1,16 +1,27 @@
 import { FETCH_TEA_REQUEST, FETCH_TEA_FAILURE, FETCH_TEA_SUCCESS } from "../Constants/Constants";
 
+// const loadState = () => {
+//     try {
+//         const serialState = localStorage.getItem('teaList');
+//         if (serialState === null) {
+//             return {}
+//         }
+//         return { teaList: JSON.parse(serialState) };
+//     } catch (err) {
+//     return {};
+//     }
+// };
+
+// const teaListFromLs = loadState();
+// console.log(teaListFromLs)
+
 const initState = {
     filterTea: 'black',
+    editTea: undefined,
     loading: false,
     error: '',
-    teaList: [
-        { name: 'Mauntain Blue', type: 'black', price: '32', amount: '100 gr', id: 1 },
-        { name: 'White Peony', type: 'white', price: '36', amount: '57 gr', id: 2 },
-        { name: 'Malty Assam', type: 'black', price: '40', amount: '100 gr', id: 3 },
-        { name: 'Topaz', type: 'puer', price: '32', amount: '100 gr', id: 4 },
-        { name: 'Jasmine Pearls', type: 'green', price: '58', amount: '85 gr', id: 5 }
-    ]
+    teaList: []
+        // ...teaListFromLs,
 }
 
 const TeaReducer = (state = initState, action) => {
@@ -18,52 +29,36 @@ const TeaReducer = (state = initState, action) => {
         case 'CHANGE_TYPE':
             return {
                 ...state,
-                filterTea: action.value
+                filterTea: action.typeOfTea
             }
-        case 'DELETE_ITEM':
+
+        case 'ADD_TEA':
+            return {
+                ...state,
+                teaList: [...state.teaList, action.addTea]
+            }
+
+        case 'EDIT_TEA':
+            return {
+                ...state,
+                editTea: action.id
+            }
+
+        case 'CHANGE_EXISTING_TEA':
+            return {
+                ...state,
+                // teaList: state.teaList.map(el => el.id === state.editTea ?
+                //     action.teaObject : el),
+                editTea: undefined
+            }
+
+        case 'DELETE_TEA':
             let restTeaList = state.teaList.filter(el => {
                 return el.id !== action.id
             });
             return {
                 ...state,
                 teaList: restTeaList
-            }
-        case 'ADD_ITEM':
-            let newTeaList = [...state.teaList, action.addItem]
-            return {
-                ...state,
-                teaList: newTeaList
-            }
-
-        case 'SAVE_NAME':
-            let changedNameTea = [...state.teaList].map(el =>
-                el.id === action.id ? {
-                    ...el,
-                    name: action.newName
-                } : el)
-            return {
-                ...state,
-                teaList: changedNameTea
-            }
-        case 'SAVE_PRICE':
-            let changedPriceTea = [...state.teaList].map(el =>
-                el.id === action.id ? {
-                    ...el,
-                    price: action.newPrice
-                } : el)
-            return {
-                ...state,
-                teaList: changedPriceTea
-            }
-        case 'SAVE_AMOUNT':
-            let changedAmounTea = [...state.teaList].map(el =>
-                el.id === action.id ? {
-                    ...el,
-                    amount: action.newAmount
-                } : el)
-            return {
-                ...state,
-                teaList: changedAmounTea
             }
 
         case FETCH_TEA_REQUEST:
@@ -72,7 +67,8 @@ const TeaReducer = (state = initState, action) => {
                 loading: true
             }
         case FETCH_TEA_SUCCESS:
-            let loadedTeaData = Object.values(action.teaData); // transform object to array
+            let loadedTeaData = Object.keys(action.teaData).map(el =>
+                ({...action.teaData[el], id: el})); // transform object to array
             return {
                 ...state,
                 loading: false,
